@@ -1,0 +1,38 @@
+---
+title: "Speeches"
+author: "Owen Bernstein"
+date: "3/6/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(janitor)
+library(tidyverse)
+library(tidytext)
+
+populism <- c("Deceit", "treason", "betray", "absurd", "arrogant", "promise", "corrupt", "direct", "elite", "establishment", "ruling", "caste", "class", "mafia", "freedom of expression", "undemocratic", "politic", "propaganda", "referend", "regime", "shameless", "shame", "admit", "tradition", "people")
+
+speeches <- read_csv("raw-data/speeches.csv") %>% 
+  select("President":"Text") %>% 
+  clean_names() %>% 
+  filter(str_starts(year, "1") | str_starts(year, "2")) %>% 
+  group_by(president, year) %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(word) %>% 
+  filter(word == "deceit" | word == "treason" | word == "betray"
+         | word == "absurd" | word == "arrogant" | word == "promise"
+         | word == "corrupt" | word == "direct" | word == "elite"
+         | word == "establishment" | word == "ruling" | word == "caste"
+         | word == "class" | word == "mafia" | word == "freedom of expression"
+         | word == "undemocratic" | word == "politic" | word == "propaganda"
+         | word == "referend" | word == "regime" | word == "shameless" 
+         | word == "shame" | word == "admit" | word == "tradition"
+         | word == "people")
+
+```
+
+
+
