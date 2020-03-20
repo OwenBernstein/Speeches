@@ -7,4 +7,92 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+library(ggrepel)
+library(janitor)
+library(tidytext)
+library(tidyverse)
 ```
+
+```{r}
+
+
+trump_speeches <- read_csv("raw-data/speeches_new.csv") %>% 
+  select("Speaker":"Text") %>% 
+  clean_names() %>% 
+  filter(speaker == "Donald Trump") %>% 
+  group_by(title) %>% 
+  unnest_tokens(word, text) %>% 
+  anti_join(stop_words) %>% 
+  count(word, sort = TRUE)
+  
+populism <- trump_speeches %>% 
+  group_by(title) %>% 
+  filter(str_detect(word, "deceit") | str_detect(word, "treason")
+         | str_detect(word, "betray") | str_detect(word, "absurd")
+         | str_detect(word, "arrogant") | str_detect(word, "promise") 
+         | str_detect(word, "corrupt") | str_detect(word, "direct")
+         | str_detect(word, "elite") | str_detect(word, "establishment")
+         | str_detect(word, "ruling") | str_detect(word, "caste")
+         | str_detect(word, "class") | str_detect(word, "mafia")
+         | str_detect(word, "freedom of expression")
+         | str_detect(word, "undemocratic") | str_detect(word, "politic")
+         | str_detect(word, "propaganda") | str_detect(word, "referend")
+         | str_detect(word, "regime") | str_detect(word, "shame")
+         | str_detect(word, "admit") | str_detect(word, "tradition")
+         | str_detect(word, "people")) %>% 
+  mutate(populism_count = sum(n)) %>% 
+  arrange(desc(populism_count))
+
+environment <- trump_speeches %>% 
+  group_by(title) %>% 
+  filter(str_detect(word, "green") | str_detect(word, "climate")
+         | str_detect(word, "environment") | word == "heating") %>% 
+  mutate(environment_count = sum(n)) %>% 
+  arrange(desc(environment_count))
+
+immigration <- trump_speeches %>% 
+  group_by(title) %>% 
+  filter(str_detect(word, "asylum") | str_detect(word, "halal")
+         | str_detect(word, "scarf") | str_detect(word, "illegal")
+         | str_detect(word, "immigra") | str_detect(word, "ISlam") 
+         | str_detect(word, "Koran") | str_detect(word, "Muslim")
+         | str_detect(word, "foreign")) %>% 
+  mutate(immigration_count = sum(n)) %>% 
+  arrange(desc(immigration_count))
+
+progressive <- trump_speeches %>% 
+  group_by(title) %>% 
+  filter(word == "progressive" | word == "right" | word == "freedom" 
+         | word == "self-disposition" | word == "handicap" | word == "poverty" 
+         | word == "protection" | word == "honest" | word == "equal" 
+         | word == "education" | word == "pension" | word == "social" 
+         | word == "weak") %>% 
+  mutate(progressive_count = sum(n)) %>% 
+  arrange(desc(progressive_count))
+
+conservatism <- trump_speeches %>% 
+  group_by(title) %>% 
+  filter(word == "belief" | word == "family" | word == "church"
+         | word == "norm" | word == "porn" | word == "sex" | word == "values"
+         | word == "conservative" | word == "conservatism") %>% 
+  mutate(conservatism_count = sum(n)) %>% 
+  arrange(desc(conservatism_count))
+
+sentiment_trump_speeches <- populism %>% 
+  full_join(environment, by = "title") %>% 
+  full_join(immigration, by = "title") %>% 
+  full_join(progressive, by = "title") %>% 
+  full_join(conservatism, by = "title") %>% 
+  select(title, populism_count, environment_count, immigration_count, progressive_count, conservatism_count)
+
+
+ggplot(sentiment_trump_speeches, aes(populism_count, immigration_count)) +
+  geom_point() +
+  labs(title = "Content Analysis of Trump Speechs",
+       subtitle = "30 speeches and interviews from the 2016 campaign",
+       x = "Count of Populist Language", y = "Count of Language Relating to Immigrants") +
+  theme_classic()
+  
+```
+
