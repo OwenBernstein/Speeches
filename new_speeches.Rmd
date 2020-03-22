@@ -1,12 +1,8 @@
----
-title: "New Speeches"
-author: "Owen Bernstein"
-date: "3/20/2020"
-output: html_document
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+
+# Loading necessary packages. 
 
 library(ggrepel)
 library(janitor)
@@ -14,8 +10,10 @@ library(tidytext)
 library(tidyverse)
 ```
 
-```{r}
+```{r, include = FALSE}
 
+# Reading in the data and cleaning it. Only using Trump speeches and then
+# counting words.
 
 trump_speeches <- read_csv("raw-data/speeches_new.csv") %>% 
   select("Speaker":"Text") %>% 
@@ -26,6 +24,8 @@ trump_speeches <- read_csv("raw-data/speeches_new.csv") %>%
   anti_join(stop_words) %>% 
   count(word, sort = TRUE)
   
+# Counting words by each differnet content category
+
 populism <- trump_speeches %>% 
   group_by(title) %>% 
   filter(str_detect(word, "deceit") | str_detect(word, "treason")
@@ -84,15 +84,58 @@ sentiment_trump_speeches <- populism %>%
   full_join(immigration, by = "title") %>% 
   full_join(progressive, by = "title") %>% 
   full_join(conservatism, by = "title") %>% 
-  select(title, populism_count, environment_count, immigration_count, progressive_count, conservatism_count)
+  select(title, populism_count, environment_count, immigration_count, 
+         progressive_count, conservatism_count) %>% 
+  distinct()
 
+```
 
-ggplot(sentiment_trump_speeches, aes(populism_count, immigration_count)) +
-  geom_point() +
-  labs(title = "Content Analysis of Trump Speechs",
+```{r, include = FALSE}
+
+# Setting nas to 0
+
+sentiment_trump_speeches[is.na(sentiment_trump_speeches)] = 0
+
+# Making a plot with the extreme values having a specific color
+
+plot <- ggplot(sentiment_trump_speeches, aes(populism_count,
+                                             immigration_count)) +
+  geom_point(
+    color = case_when(sentiment_trump_speeches$populism_count > 55 ~ "#1b9e77",
+                      sentiment_trump_speeches$immigration_count > 23
+                      ~ "#d95f02", TRUE ~ "#7570b3"))
+
+# Adding geom labels with repel to the extreme populism speeches.
+
+plot2 <- plot +
+  geom_label_repel(aes(label = ifelse(populism_count > 55, as.character(title),
+                                      '')),
+                  size = 3,
+                  box.padding   = 0.35, 
+                  point.padding = 0.5,
+                  segment.color = 'grey50') +
+  labs(title = "Content Analysis of Trump's Speechs",
        subtitle = "30 speeches and interviews from the 2016 campaign",
-       x = "Count of Populist Language", y = "Count of Language Relating to Immigrants") +
+       x = "Count of Populist Language", y = "Count of Language Relating to
+       Immigration") +
   theme_classic()
   
+# Adding labels to the extreme immigration count speeches
+
+plot3 <- plot2 +
+  geom_label_repel(aes(label = ifelse(immigration_count > 23,
+                                      as.character(title), '')),
+                  size = 2.6,
+                  box.padding   = 1, 
+                  point.padding = 1,
+                  segment.color = 'grey50')
 ```
+
+```{r, echo = FALSE}
+
+plot3
+
+```
+
+
 
