@@ -131,10 +131,13 @@ plot3 <- plot2 +
                   segment.color = 'grey50')
 ```
 
-```{r, echo = FALSE}
+```{r, include = FALSE}
 
 plot3
 
+# Saving my plot to the shiny app directory.
+
+ggsave("speeches_shiny/dist_plot.png")
 ```
 
 
