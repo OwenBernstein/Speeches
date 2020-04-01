@@ -26,7 +26,8 @@ server <- function(input, output) {
         
         # Return a list containing the filename and alt text
         list(src = filename,
-             height = 600,
+             height = 700,
+             width = 800,
              alt = 'plot')
     }, deleteFile = FALSE)
 }
