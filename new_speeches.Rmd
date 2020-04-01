@@ -102,7 +102,7 @@ plot <- ggplot(sentiment_trump_speeches, aes(populism_count,
                                              immigration_count)) +
   geom_point(
     color = case_when(sentiment_trump_speeches$populism_count > 55 ~ "#1b9e77",
-                      sentiment_trump_speeches$immigration_count > 23
+                      sentiment_trump_speeches$immigration_count > 25
                       ~ "#d95f02", TRUE ~ "#7570b3"))
 
 # Adding geom labels with repel to the extreme populism speeches.
@@ -112,7 +112,7 @@ plot2 <- plot +
                                       '')),
                   size = 3,
                   box.padding   = 0.35, 
-                  point.padding = 0.5,
+                  point.padding = 0.4,
                   segment.color = 'grey50') +
   labs(title = "Content Analysis of Trump's Speechs",
        subtitle = "30 speeches and interviews from the 2016 campaign",
@@ -123,11 +123,11 @@ plot2 <- plot +
 # Adding labels to the extreme immigration count speeches
 
 plot3 <- plot2 +
-  geom_label_repel(aes(label = ifelse(immigration_count > 23,
+  geom_label_repel(aes(label = ifelse(immigration_count > 25,
                                       as.character(title), '')),
                   size = 2.6,
-                  box.padding   = 1, 
-                  point.padding = 1,
+                  box.padding   = 0.3, 
+                  point.padding = 0.1,
                   segment.color = 'grey50')
 ```
 
