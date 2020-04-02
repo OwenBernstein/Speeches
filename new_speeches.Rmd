@@ -114,7 +114,7 @@ plot2 <- plot +
                   box.padding   = 0.35, 
                   point.padding = 0.4,
                   segment.color = 'grey50') +
-  labs(title = "Content Analysis of Trump's Speechs",
+  labs(title = "Content Analysis of Trump's Speeches",
        subtitle = "55 speeches and interviews from the 2016 campaign",
        x = "Count of Populist Language", y = "Count of Language Relating to
        Immigration") +

@@ -8,29 +8,52 @@
 #
 library(shiny)
 
-ui <- fluidPage(
-    
-    titlePanel("Final Project Shiny App"),
-    
-    # Show a plot of the generated distribution
-    mainPanel(
-        plotOutput("preImage")
-    )
-)
+ui <- navbarPage(
+    "Speeches Content Analysis",
+    tabPanel("Model",
+             fluidPage(
+                 titlePanel("Model Title"),
+                 sidebarLayout(
+                     sidebarPanel(
+                         selectInput(
+                             "plot_type",
+                             "Plot Type",
+                             c("Option A" = "a", "Option B" = "b")
+                         )),
+                     mainPanel(plotOutput("line_plot")))
+             )),
+    tabPanel("Discussion",
+             titlePanel("Discussion Title"),
+             p("Tour of the modeling choices you made and 
+              an explanation of why you made them")),
+    tabPanel("About", 
+             titlePanel("About"),
+             h3("Project Background and Motivations"),
+             p("Hello, this is where I talk about my project."),
+             h3("About Me"),
+             p("My name is ______ and I study ______. 
+             You can reach me at ______@college.harvard.edu.")))
 
 server <- function(input, output) {
-    # Send a pre-rendered image, and don't delete the image after sending it
-    output$preImage <- renderImage({
-        # When input$n is 3, filename is ./images/image3.jpeg
-        filename <- normalizePath(file.path("dist_plot.png"))
+    output$line_plot <- renderPlot({
+        # Generate type based on input$plot_type from ui
         
-        # Return a list containing the filename and alt text
-        list(src = filename,
-             height = 700,
-             width = 800,
-             alt = 'plot')
-    }, deleteFile = FALSE)
+        ifelse(
+            input$plot_type == "a",
+            
+            # If input$plot_type is "a", plot histogram of "waiting" column 
+            # from the faithful dataframe
+            
+            x   <- faithful[, 2],
+            
+            # If input$plot_type is "b", plot histogram of "eruptions" column
+            # from the faithful dataframe
+            
+            x   <- faithful[, 1]
+        )
+        
+        # Draw the histogram with the specified number of bins
+        
+        hist(x, col = 'darkgray', border = 'white')
+    })
 }
-
-# Run the application 
-shinyApp(ui = ui, server = server)
